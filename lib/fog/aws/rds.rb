@@ -5,6 +5,8 @@ module Fog
     class RDS < Fog::Service
 
       class IdentifierTaken < Fog::Errors::Error; end
+      
+      class AuthorizationAlreadyExists < Fog::Errors::Error; end
 
       requires :aws_access_key_id, :aws_secret_access_key
       recognizes :region, :host, :path, :port, :scheme, :persistent
@@ -62,7 +64,8 @@ module Fog
             owner_id = Fog::AWS::Mock.owner_id
             hash[region] = Hash.new do |region_hash, key|
               region_hash[key] = {
-                :servers => {}
+                :servers => {},
+                :security_groups => {}
               }
             end
           end
@@ -136,6 +139,8 @@ module Fog
             'rds.us-west-1.amazonaws.com'
           when 'us-west-2'
             'rds.us-west-2.amazonaws.com'
+          when 'sa-east-1'
+            'rds.sa-east-1.amazonaws.com'
           else
             raise ArgumentError, "Unknown region: #{options[:region].inspect}"
           end
@@ -185,6 +190,8 @@ module Fog
                 raise Fog::AWS::RDS::NotFound.slurp(error, match[2])
               when 'DBParameterGroupAlreadyExists'
                 raise Fog::AWS::RDS::IdentifierTaken.slurp(error, match[2])
+              when 'AuthorizationAlreadyExists'
+                raise Fog::AWS::RDS::AuthorizationAlreadyExists.slurp(error, match[2])
               else
                 raise
               end
