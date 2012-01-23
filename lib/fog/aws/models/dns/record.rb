@@ -25,13 +25,14 @@ module Fog
         end
 
         def destroy
-          requires :name, :ttl, :type, :value, :zone
+          requires :name, :ttl, :type, :value, :zone, :alias_target
           options = {
             :action           => 'DELETE',
             :name             => name,
             :resource_records => [*value],
             :ttl              => ttl,
-            :type             => type
+            :type             => type,
+            :alias_target     => alias_target
           }
           connection.change_resource_record_sets(zone.id, [options])
           true
@@ -42,13 +43,14 @@ module Fog
         end
 
         def save
-          requires :name, :ttl, :type, :value, :zone
+          requires :name, :ttl, :type, :value, :zone, :alias_target
           options = {
             :action           => 'CREATE',
             :name             => name,
             :resource_records => [*value],
             :ttl              => ttl,
-            :type             => type
+            :type             => type,
+            :alias_target     => alias_target
           }
           data = connection.change_resource_record_sets(zone.id, [options]).body
           merge_attributes(data)
