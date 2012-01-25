@@ -19,7 +19,7 @@ module Fog
             if @section == :resource_record_set
               case name
               when 'Name', 'Type', 'TTL'
-                @resource_record_set[name] = value
+                @resource_record_set[name] = value.gsub(/\\\d{3}/) {|c| c[1..-1].to_i(8).chr}
               when 'Value'
                 @resource_record_set['ResourceRecords'] << value
               when 'AliasTarget'
